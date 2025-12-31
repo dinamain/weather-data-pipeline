@@ -1,0 +1,4 @@
+id,city,region,country,temperature_c,humidity,wind_kph,condition,api_last_updated,fetched_at_utc
+1,Kochi,Kerala,India,27.1,79,11.5,Mist,2025-12-31 20:30:00,2025-12-31 15:07:44.835651
+2,Kochi,Kerala,India,26.1,84,10.4,Mist,2025-12-31 21:00:00,2025-12-31 15:38:51.520012
+3,Kochi,Kerala,India,26.1,84,10.4,Mist,2025-12-31 21:00:00,2025-12-31 15:39:15.635214

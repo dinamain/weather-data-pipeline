@@ -1,0 +1,9 @@
+weatherapi:
+  base_url: "http://api.weatherapi.com/v1/current.json"
+  api_key: "2754c38644164670b55144217253112"
+  cities:
+  - Kochi
+  - Bangalore
+  - Mumbai
+
+  units: "metric"
