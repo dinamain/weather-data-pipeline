@@ -166,3 +166,14 @@ Matplotlib
 YAML
 
 Logging
+
+
+## Phase 1: Advanced Analytics (In Progress)
+
+- Feature engineering on daily aggregated data
+- Lag features (t-1, t-7)
+- Rolling averages (7-day, 14-day)
+- Temperature deltas & volatility
+- Humidity trend features
+
+This phase focuses on understanding time-series behavior before applying machine learning.
