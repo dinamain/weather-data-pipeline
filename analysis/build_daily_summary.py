@@ -29,7 +29,8 @@ aggregation_query = """
 INSERT OR REPLACE INTO weather_daily_summary
 SELECT
     city,
-    DATE(api_last_updated) AS date,
+    DATE(datetime(fetched_at_utc, '+5 hours', '+30 minutes'))
+ AS date,
     AVG(temperature_c) AS avg_temperature,
     MIN(temperature_c) AS min_temperature,
     MAX(temperature_c) AS max_temperature,

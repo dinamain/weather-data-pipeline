@@ -1,9 +1,25 @@
+"""This script is the bridge between raw data and modeling.
+
+It:
+
+Reads daily aggregated weather data from the database
+
+Creates time-series features
+
+Outputs a single canonical ML-ready dataset
+
+👉 Everything downstream (EDA, baselines, ML) depends on this CSV."""
+
 import sqlite3
 import pandas as pd
 import os
 
+# --------------------------------------------------
+# Configuration
+# --------------------------------------------------
 DB_PATH = "database/weather.db"
-OUTPUT_PATH = "outputs/engineered_daily_features.csv"
+OUTPUT_DIR = "outputs"
+OUTPUT_FILE = os.path.join(OUTPUT_DIR, "engineered_daily_features.csv")
 
 # --------------------------------------------------
 # Load daily summary data
@@ -19,27 +35,30 @@ SELECT
     max_temperature,
     avg_humidity
 FROM weather_daily_summary
+ORDER BY city, date
 """
 
 df = pd.read_sql_query(query, conn)
 conn.close()
 
 if df.empty:
-    raise ValueError("No data found in weather_daily_summary")
+    raise ValueError("❌ No data found in weather_daily_summary table")
 
+# Convert date column
 df["date"] = pd.to_datetime(df["date"])
-df = df.sort_values(["city", "date"])
 
 print("✅ Daily summary data loaded")
 print(df.head())
+
 # --------------------------------------------------
-# Temperature delta (day-over-day change)
+# Temperature change (day-over-day)
 # --------------------------------------------------
 df["temp_delta_1d"] = df.groupby("city")["avg_temperature"].diff()
 
 print("✅ Temperature delta feature created")
+
 # --------------------------------------------------
-# Rolling averages
+# Rolling averages (trend smoothing)
 # --------------------------------------------------
 df["temp_rolling_7d"] = (
     df.groupby("city")["avg_temperature"]
@@ -56,8 +75,9 @@ df["temp_rolling_14d"] = (
 )
 
 print("✅ Rolling average features created")
+
 # --------------------------------------------------
-# Lag features
+# Lag features (memory)
 # --------------------------------------------------
 df["temp_lag_1d"] = df.groupby("city")["avg_temperature"].shift(1)
 df["temp_lag_7d"] = df.groupby("city")["avg_temperature"].shift(7)
@@ -77,8 +97,9 @@ df["humidity_rolling_7d"] = (
 )
 
 print("✅ Humidity trend features created")
+
 # --------------------------------------------------
-# Temperature volatility (7-day window)
+# Temperature volatility (stability indicator)
 # --------------------------------------------------
 df["temp_volatility_7d"] = (
     df.groupby("city")["avg_temperature"]
@@ -92,7 +113,7 @@ print("✅ Temperature volatility feature created")
 # --------------------------------------------------
 # Save engineered dataset
 # --------------------------------------------------
-os.makedirs("outputs", exist_ok=True)
-df.to_csv(OUTPUT_PATH, index=False)
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+df.to_csv(OUTPUT_FILE, index=False)
 
-print(f"📁 Engineered features saved to {OUTPUT_PATH}")
+print(f"📁 Engineered daily features saved to {OUTPUT_FILE}")
